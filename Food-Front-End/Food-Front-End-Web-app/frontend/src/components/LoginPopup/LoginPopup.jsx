@@ -2,12 +2,12 @@ import React, { useContext, useState } from 'react'
 import './LoginPopup.css'
 import { assets } from '../../assets/assets'
 import { StoreContext } from '../../Context/StoreContext'
-import axios from 'axios'
+import { authApi } from '../../api'
 import { toast } from 'react-toastify'
 
 const LoginPopup = ({ setShowLogin }) => {
 
-    const { setToken, url,loadCartData, saveUser } = useContext(StoreContext)
+    const { setToken, loadCartData, saveUser } = useContext(StoreContext)
     const [currState, setCurrState] = useState("Sign Up");
 
     const [data, setData] = useState({
@@ -24,25 +24,23 @@ const LoginPopup = ({ setShowLogin }) => {
 
     const onLogin = async (e) => {
         e.preventDefault()
-
-        let new_url = url;
-        if (currState === "Login") {
-            new_url += "/api/user/login";
-        }
-        else {
-            new_url += "/api/user/register"
-        }
-        const response = await axios.post(new_url, data);
-        if (response.data.success) {
-            setToken(response.data.token)
-            localStorage.setItem("token", response.data.token)
-            // Persist basic profile for the Profile page (name known only on Sign Up).
-            saveUser({ name: data.name || data.email.split("@")[0], email: data.email })
-            loadCartData({token:response.data.token})
-            setShowLogin(false)
-        }
-        else {
-            toast.error(response.data.message)
+        try {
+            const response = currState === "Login"
+                ? await authApi.login({ email: data.email, password: data.password })
+                : await authApi.register(data)
+            if (response.success) {
+                setToken(response.token)
+                localStorage.setItem("token", response.token)
+                // Persist basic profile for the Profile page (name known only on Sign Up).
+                saveUser({ name: data.name || data.email.split("@")[0], email: data.email })
+                loadCartData()
+                setShowLogin(false)
+            }
+            else {
+                toast.error(response.message)
+            }
+        } catch (err) {
+            toast.error(err.message)
         }
     }
 

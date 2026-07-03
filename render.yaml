@@ -1,0 +1,21 @@
+# Render Blueprint for the Food-Del Express backend.
+# Deploy: Render Dashboard -> New + -> Blueprint -> pick this repo. It reads this file,
+# builds from the backend folder (rootDir) and asks you for the secret env vars.
+services:
+  - type: web
+    name: food-del-backend
+    runtime: node
+    rootDir: Food-Backend-End/Food-Backend-ExpressJs/backend
+    plan: free                 # free tier sleeps after ~15 min idle (cold start on next hit)
+    region: oregon             # change if you prefer (singapore, frankfurt, etc.)
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /         # server responds "API Working" here
+    envVars:
+      - key: MONGODB_URI       # MongoDB Atlas connection string
+        sync: false
+      - key: JWT_SECRET        # secret for signing JWTs
+        sync: false
+      - key: STRIPE_SECRET_KEY # Stripe secret key (test key is fine)
+        sync: false
+      # PORT is provided by Render automatically — do NOT set it.

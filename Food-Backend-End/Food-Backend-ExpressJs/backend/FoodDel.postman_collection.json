@@ -1,0 +1,223 @@
+{
+  "info": {
+    "name": "Food Del — Backend API",
+    "_postman_id": "f00dde11-2a3b-4c5d-8e9f-fooddelapi01",
+    "description": "Express + MongoDB backend for the Food Delivery app.\n\nUsage:\n1. Set the `baseUrl` variable (default http://localhost:4000).\n2. Run **User > Register** or **User > Login** — the test script auto-saves the JWT into the `token` variable.\n3. Cart & Order (user) endpoints send the token via a raw `token` header automatically.\n\nAuth: protected routes read a raw `token` header (NOT `Authorization: Bearer`). Responses are HTTP 200 with `{ success, ... }` — always check `success`. Images are served from `/images/<filename>`.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4000" },
+    { "key": "token", "value": "" },
+    { "key": "foodId", "value": "" },
+    { "key": "orderId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "Register (POST /api/user/register)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try { const d = pm.response.json(); if (d && d.token) { pm.collectionVariables.set('token', d.token); console.log('Saved token'); } } catch (e) {}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/user/register", "host": ["{{baseUrl}}"], "path": ["api", "user", "register"] },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}" },
+            "description": "Create a user. Password must be >= 8 chars and email must be valid. Returns { success, token }."
+          }
+        },
+        {
+          "name": "Login (POST /api/user/login)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try { const d = pm.response.json(); if (d && d.token) { pm.collectionVariables.set('token', d.token); console.log('Saved token'); } } catch (e) {}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/user/login", "host": ["{{baseUrl}}"], "path": ["api", "user", "login"] },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}" },
+            "description": "Authenticate. Returns { success, token }. The test script saves the token."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Food",
+      "item": [
+        {
+          "name": "List Food (GET /api/food/list)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/food/list", "host": ["{{baseUrl}}"], "path": ["api", "food", "list"] },
+            "description": "Public. Returns { success, data: [food] }. Image URL = {{baseUrl}}/images/<image>."
+          }
+        },
+        {
+          "name": "Add Food (POST /api/food/add)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/food/add", "host": ["{{baseUrl}}"], "path": ["api", "food", "add"] },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Margherita Pizza", "type": "text" },
+                { "key": "description", "value": "Classic cheese & tomato pizza", "type": "text" },
+                { "key": "price", "value": "250", "type": "text" },
+                { "key": "category", "value": "Pizza", "type": "text" },
+                { "key": "image", "type": "file", "src": [] }
+              ]
+            },
+            "description": "Multipart form-data. Attach an image file under the `image` key. Returns { success, message }."
+          }
+        },
+        {
+          "name": "Remove Food (POST /api/food/remove)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/food/remove", "host": ["{{baseUrl}}"], "path": ["api", "food", "remove"] },
+            "body": { "mode": "raw", "raw": "{\n  \"id\": \"{{foodId}}\"\n}" },
+            "description": "Delete a food by its _id (and its image file)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cart",
+      "item": [
+        {
+          "name": "Get Cart (POST /api/cart/get)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "token", "value": "{{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/cart/get", "host": ["{{baseUrl}}"], "path": ["api", "cart", "get"] },
+            "body": { "mode": "raw", "raw": "{}" },
+            "description": "Requires token header. Returns { success, cartData: { [foodId]: qty } }."
+          }
+        },
+        {
+          "name": "Add To Cart (POST /api/cart/add)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "token", "value": "{{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/cart/add", "host": ["{{baseUrl}}"], "path": ["api", "cart", "add"] },
+            "body": { "mode": "raw", "raw": "{\n  \"itemId\": \"{{foodId}}\"\n}" },
+            "description": "Requires token header. Increments the quantity of a food in the user's cart."
+          }
+        },
+        {
+          "name": "Remove From Cart (POST /api/cart/remove)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "token", "value": "{{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/cart/remove", "host": ["{{baseUrl}}"], "path": ["api", "cart", "remove"] },
+            "body": { "mode": "raw", "raw": "{\n  \"itemId\": \"{{foodId}}\"\n}" },
+            "description": "Requires token header. Decrements the quantity of a food in the user's cart."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Order",
+      "item": [
+        {
+          "name": "Place Order - Stripe (POST /api/order/place)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "token", "value": "{{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/order/place", "host": ["{{baseUrl}}"], "path": ["api", "order", "place"] },
+            "body": { "mode": "raw", "raw": "{\n  \"items\": [\n    { \"name\": \"Margherita Pizza\", \"price\": 250, \"quantity\": 2 }\n  ],\n  \"amount\": 550,\n  \"address\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john@example.com\",\n    \"street\": \"12 Baker Street\",\n    \"city\": \"Mumbai\",\n    \"state\": \"MH\",\n    \"zipcode\": \"400001\",\n    \"country\": \"India\",\n    \"phone\": \"9876543210\"\n  }\n}" },
+            "description": "Requires token header. Creates an order and returns { success, session_url } for Stripe checkout."
+          }
+        },
+        {
+          "name": "Place Order - COD (POST /api/order/placecod)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "token", "value": "{{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/order/placecod", "host": ["{{baseUrl}}"], "path": ["api", "order", "placecod"] },
+            "body": { "mode": "raw", "raw": "{\n  \"items\": [\n    { \"name\": \"Margherita Pizza\", \"price\": 250, \"quantity\": 2 }\n  ],\n  \"amount\": 550,\n  \"address\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john@example.com\",\n    \"street\": \"12 Baker Street\",\n    \"city\": \"Mumbai\",\n    \"state\": \"MH\",\n    \"zipcode\": \"400001\",\n    \"country\": \"India\",\n    \"phone\": \"9876543210\"\n  }\n}" },
+            "description": "Requires token header. Places a cash-on-delivery order and clears the user's cart."
+          }
+        },
+        {
+          "name": "My Orders (POST /api/order/userorders)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "token", "value": "{{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/order/userorders", "host": ["{{baseUrl}}"], "path": ["api", "order", "userorders"] },
+            "body": { "mode": "raw", "raw": "{}" },
+            "description": "Requires token header. Returns { success, data: [order] } for the logged-in user."
+          }
+        },
+        {
+          "name": "List All Orders (GET /api/order/list)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/order/list", "host": ["{{baseUrl}}"], "path": ["api", "order", "list"] },
+            "description": "Admin listing of all orders. Returns { success, data: [order] }."
+          }
+        },
+        {
+          "name": "Update Status (POST /api/order/status)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/order/status", "host": ["{{baseUrl}}"], "path": ["api", "order", "status"] },
+            "body": { "mode": "raw", "raw": "{\n  \"orderId\": \"{{orderId}}\",\n  \"status\": \"Food Processing\"\n}" },
+            "description": "Admin: update an order's status (e.g. Food Processing, Out for delivery, Delivered)."
+          }
+        },
+        {
+          "name": "Verify Payment (POST /api/order/verify)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/order/verify", "host": ["{{baseUrl}}"], "path": ["api", "order", "verify"] },
+            "body": { "mode": "raw", "raw": "{\n  \"orderId\": \"{{orderId}}\",\n  \"success\": \"true\"\n}" },
+            "description": "Called after Stripe checkout. success='true' confirms payment; otherwise the order is deleted."
+          }
+        }
+      ]
+    }
+  ]
+}

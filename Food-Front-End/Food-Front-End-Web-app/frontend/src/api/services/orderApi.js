@@ -1,0 +1,17 @@
+import client from '../client'
+
+// Order endpoints (token attached automatically where the backend requires it).
+export const orderApi = {
+  // orderData { items, amount, address } -> { success, session_url }  (Stripe)
+  place: (orderData) => client.post('/api/order/place', orderData),
+  // orderData { items, amount, address } -> { success, message }  (Cash on delivery)
+  placeCod: (orderData) => client.post('/api/order/placecod', orderData),
+  // -> { success, data: [order] } for the logged-in user
+  userOrders: () => client.post('/api/order/userorders', {}),
+  // -> { success, data: [order] } (all orders / admin)
+  list: () => client.get('/api/order/list'),
+  // { orderId, status } -> { success, message }
+  updateStatus: (payload) => client.post('/api/order/status', payload),
+  // (success, orderId) -> { success }
+  verify: (success, orderId) => client.post('/api/order/verify', { success, orderId }),
+}

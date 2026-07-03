@@ -4,7 +4,7 @@ import { StoreContext } from '../../Context/StoreContext'
 import { assets } from '../../assets/assets';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import axios from 'axios';
+import { orderApi } from '../../api';
 
 const PlaceOrder = () => {
 
@@ -21,7 +21,7 @@ const PlaceOrder = () => {
         phone: ""
     })
 
-    const { getTotalCartAmount, token, food_list, cartItems, url, setCartItems,currency,deliveryCharge } = useContext(StoreContext);
+    const { getTotalCartAmount, token, food_list, cartItems, setCartItems,currency,deliveryCharge } = useContext(StoreContext);
 
     const navigate = useNavigate();
 
@@ -46,28 +46,30 @@ const PlaceOrder = () => {
             items: orderItems,
             amount: getTotalCartAmount() + deliveryCharge,
         }
-        if (payment === "stripe") {
-            let response = await axios.post(url + "/api/order/place", orderData, { headers: { token } });
-            if (response.data.success) {
-                const { session_url } = response.data;
-                window.location.replace(session_url);
+        try {
+            if (payment === "stripe") {
+                const response = await orderApi.place(orderData);
+                if (response.success) {
+                    window.location.replace(response.session_url);
+                }
+                else {
+                    toast.error("Something Went Wrong")
+                }
             }
             else {
-                toast.error("Something Went Wrong")
+                const response = await orderApi.placeCod(orderData);
+                if (response.success) {
+                    navigate("/myorders")
+                    toast.success(response.message)
+                    setCartItems({});
+                }
+                else {
+                    toast.error("Something Went Wrong")
+                }
             }
+        } catch (err) {
+            toast.error(err.message)
         }
-        else{
-            let response = await axios.post(url + "/api/order/placecod", orderData, { headers: { token } });
-            if (response.data.success) {
-                navigate("/myorders")
-                toast.success(response.data.message)
-                setCartItems({});
-            }
-            else {
-                toast.error("Something Went Wrong")
-            }
-        }
-
     }
 
     useEffect(() => {

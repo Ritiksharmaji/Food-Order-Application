@@ -1,11 +1,11 @@
 import { createContext, useEffect, useState } from "react";
-import { food_list, menu_list } from "../assets/assets";
-import axios from "axios";
+import { menu_list } from "../assets/assets";
+import { API_URL, foodApi, cartApi } from "../api";
 export const StoreContext = createContext(null);
 
 const StoreContextProvider = (props) => {
 
-    const url = "http://localhost:4000"
+    const url = API_URL
     const [food_list, setFoodList] = useState([]);
     const [cartItems, setCartItems] = useState({});
     const [token, setToken] = useState("")
@@ -41,14 +41,14 @@ const StoreContextProvider = (props) => {
             setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
         }
         if (token) {
-            await axios.post(url + "/api/cart/add", { itemId }, { headers: { token } });
+            await cartApi.add(itemId);
         }
     }
 
     const removeFromCart = async (itemId) => {
         setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }))
         if (token) {
-            await axios.post(url + "/api/cart/remove", { itemId }, { headers: { token } });
+            await cartApi.remove(itemId);
         }
     }
 
@@ -69,13 +69,13 @@ const StoreContextProvider = (props) => {
     }
 
     const fetchFoodList = async () => {
-        const response = await axios.get(url + "/api/food/list");
-        setFoodList(response.data.data)
+        const response = await foodApi.list();
+        setFoodList(response.data)
     }
 
-    const loadCartData = async (token) => {
-        const response = await axios.post(url + "/api/cart/get", {}, { headers: token });
-        setCartItems(response.data.cartData);
+    const loadCartData = async () => {
+        const response = await cartApi.get();
+        setCartItems(response.cartData);
     }
 
     useEffect(() => {
@@ -83,7 +83,7 @@ const StoreContextProvider = (props) => {
             await fetchFoodList();
             if (localStorage.getItem("token")) {
                 setToken(localStorage.getItem("token"))
-                await loadCartData({ token: localStorage.getItem("token") })
+                await loadCartData()
             }
             if (localStorage.getItem("user")) {
                 try { setUser(JSON.parse(localStorage.getItem("user"))) } catch { /* ignore */ }

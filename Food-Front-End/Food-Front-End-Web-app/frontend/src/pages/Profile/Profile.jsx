@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import { orderApi } from '../../api'
 import './Profile.css'
 import { StoreContext } from '../../Context/StoreContext'
 
 const Profile = () => {
-  const { url, token, user, currency, setToken, saveUser, getTotalCartAmount, cartItems } = useContext(StoreContext)
+  const { token, user, currency, setToken, saveUser, cartItems } = useContext(StoreContext)
   const navigate = useNavigate()
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
@@ -14,8 +14,8 @@ const Profile = () => {
     const load = async () => {
       if (!token) { setLoading(false); return }
       try {
-        const res = await axios.post(url + '/api/order/userorders', {}, { headers: { token } })
-        setOrders(res.data.data || [])
+        const res = await orderApi.userOrders()
+        setOrders(res.data || [])
       } catch {
         setOrders([])
       } finally {
