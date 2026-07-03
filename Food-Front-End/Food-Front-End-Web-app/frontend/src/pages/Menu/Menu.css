@@ -1,0 +1,67 @@
+.menu-page { margin: 40px 0 60px; animation: fadeIn 0.6s; }
+
+.menu-hero {
+  text-align: center;
+  background: linear-gradient(135deg, #fff4f0, #ffe9e2);
+  border-radius: 22px;
+  padding: 46px 20px;
+  margin-bottom: 30px;
+}
+.menu-hero h1 { font-size: 42px; color: #262626; }
+.menu-hero p { color: #676767; margin: 10px 0 24px; font-size: 17px; }
+.menu-search {
+  position: relative;
+  max-width: 520px;
+  margin: 0 auto;
+}
+.menu-search input {
+  width: 100%;
+  border: none;
+  border-radius: 50px;
+  padding: 16px 46px 16px 22px;
+  font-size: 16px;
+  font-family: inherit;
+  box-shadow: 0 6px 20px #00000012;
+  outline-color: #FF4C24;
+}
+.menu-search-clear {
+  position: absolute;
+  right: 20px; top: 50%; transform: translateY(-50%);
+  cursor: pointer; color: #999;
+}
+
+.menu-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.menu-chips button {
+  border: 1px solid #e6e6e6;
+  background: #fff;
+  color: #4a4a4a;
+  padding: 9px 20px;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+.menu-chips button:hover { border-color: #FF4C24; color: #FF4C24; }
+.menu-chips button.on { background: #FF4C24; color: #fff; border-color: #FF4C24; }
+
+.menu-count { color: #676767; margin-bottom: 20px; }
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 30px;
+  row-gap: 40px;
+}
+
+.menu-empty { text-align: center; color: #676767; padding: 60px 0; }
+.menu-empty span { font-size: 54px; }
+
+@media (max-width: 700px) {
+  .menu-hero h1 { font-size: 32px; }
+}

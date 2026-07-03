@@ -1,0 +1,126 @@
+/* ---------------------------------------------------------------------------
+   Light / Dark theme.
+   New components use var(--card/--text/--muted/--border). This file defines those
+   tokens and adds targeted overrides for the app's older hardcoded surfaces so the
+   whole site flips when `body.dark` is set (toggled from the navbar).
+--------------------------------------------------------------------------- */
+:root {
+  --bg: #ffffff;
+  --text: #262626;
+  --muted: #676767;
+  --card: #ffffff;
+  --surface: #f7f7f7;
+  --border: #ececec;
+}
+
+body.dark {
+  --bg: #141414;
+  --text: #ededed;
+  --muted: #b3b3b3;
+  --card: #1f1f1f;
+  --surface: #1a1a1a;
+  --border: #2f2f2f;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Theme toggle button in the navbar */
+.navbar-theme-toggle {
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+
+/* ------------------------- DARK OVERRIDES ------------------------- */
+
+/* Headings that were hard-set to near-black */
+body.dark h1, body.dark h2, body.dark h3, body.dark h4 { color: var(--text); }
+
+/* Navbar */
+body.dark .navbar-menu { color: var(--text); }
+body.dark .navbar-menu .active { border-bottom-color: #FF4C24; }
+body.dark .navbar-right button { color: var(--text); }
+body.dark .navbar-right button:hover { background: #2a2a2a; }
+body.dark .navbar img:not(.logo) { filter: invert(0.9); }
+body.dark .navbar-profile:hover .navbar-profile-dropdown { background: #2a1f1c; }
+body.dark .navbar-profile-dropdown img { filter: invert(0.9); }
+
+/* Generic white surfaces -> dark cards */
+body.dark .food-item,
+body.dark .restaurant-card,
+body.dark .fd-review,
+body.dark .fd-review-form,
+body.dark .fd-restaurant,
+body.dark .restaurant-info,
+body.dark .about-value,
+body.dark .contact-info-card,
+body.dark .contact-form,
+body.dark .profile-stat,
+body.dark .profile-actions,
+body.dark .profile-order,
+body.dark .login-popup-container {
+  background: var(--card);
+  border-color: var(--border);
+}
+
+/* Card bodies / borders */
+body.dark .food-item { box-shadow: 0 0 12px #00000040; }
+body.dark .food-item-counter { background: #2a2a2a; }
+body.dark .fd-review, body.dark .profile-order { border-color: var(--border); }
+
+/* Muted / body text */
+body.dark .food-item-desc,
+body.dark .fd-desc, body.dark .fd-review-count, body.dark .fd-review p, body.dark .fd-empty,
+body.dark .fd-avg-count, body.dark .fd-review-date, body.dark .fd-rating-pick,
+body.dark .fd-highlights li, body.dark .fd-restaurant-cuisines, body.dark .fd-restaurant-meta,
+body.dark .fd-restaurant-addr, body.dark .fd-breadcrumb,
+body.dark .profile-id p, body.dark .profile-stat-label, body.dark .profile-order-items,
+body.dark .profile-order-status, body.dark .profile-muted,
+body.dark .about-hero-text p, body.dark .about-story p, body.dark .about-value p, body.dark .about-stat-label,
+body.dark .contact-head p, body.dark .contact-info-card p, body.dark .contact-map-inner small,
+body.dark .menu-count, body.dark .menu-hero p,
+body.dark .restaurant-card-cuisines, body.dark .restaurant-card-meta,
+body.dark .restaurant-info-label, body.dark .restaurant-address, body.dark .restaurant-empty,
+body.dark .home-section-head p, body.dark .home-empty {
+  color: var(--muted);
+}
+
+/* Review head name + section titles */
+body.dark .fd-review-head b, body.dark .restaurant-card-top h3, body.dark .fd-restaurant-top h3 { color: var(--text); }
+
+/* Inputs */
+body.dark input, body.dark textarea, body.dark .menu-search input {
+  background: #262626;
+  color: var(--text);
+  border-color: var(--border);
+}
+body.dark input::placeholder, body.dark textarea::placeholder { color: #8a8a8a; }
+
+/* Chips / pills */
+body.dark .menu-chips button { background: var(--card); color: var(--text); border-color: var(--border); }
+body.dark .menu-chips button.on { background: #FF4C24; color: #fff; border-color: #FF4C24; }
+body.dark .profile-actions button { background: #262626; border-color: var(--border); color: var(--text); }
+body.dark .profile-actions button:hover { background: #2f221e; }
+
+/* Tinted panels stay tinted but darker */
+body.dark .fd-category, body.dark .about-tag, body.dark .contact-tag { background: #2a1f1c; }
+body.dark .fd-avg, body.dark .contact-map, body.dark .menu-hero,
+body.dark .about-stats, body.dark .profile-header {
+  background: linear-gradient(135deg, #241a17, #2a1d18);
+}
+body.dark .fd-qty { border-color: var(--border); }
+body.dark .fd-qty button { background: #2a1f1c; }
+
+/* Dividers */
+body.dark hr, body.dark .food-item-counter { border-color: var(--border); }
+
+/* Cart / order tables (generic) */
+body.dark .cart-items-title, body.dark .cart-total-details { color: var(--muted); }
+body.dark hr { background-color: var(--border); }
